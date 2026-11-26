@@ -1,0 +1,2093 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>1 H TOUR - Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-dark: #090d16;
+    --bg-card: #121a2b;
+    --bg-card-2: #182238;
+    --accent: #00e5ff;
+    --accent-2: #7c4dff;
+    --success: #00e676;
+    --warning: #ffab00;
+    --danger: #ff1744;
+    --text-main: #f4f7fb;
+    --text-muted: #8b9bb4;
+    --border: rgba(255, 255, 255, 0.08);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: 'Hind Siliguri', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    min-height: 100vh;
+    padding-bottom: 84px;
+    background-image: radial-gradient(circle at 50% -10%, rgba(0, 229, 255, 0.14), transparent 55%);
+  }
+
+  /* Header */
+  .app-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(9, 13, 22, 0.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .brand-badge {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: #060911;
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.35);
+  }
+
+  .brand-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    line-height: 1.1;
+  }
+
+  .brand-sub {
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .status-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0, 230, 118, 0.12);
+    border: 1px solid rgba(0, 230, 118, 0.3);
+    color: var(--success);
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 8px var(--success);
+    animation: pulse 1.8s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.45; transform: scale(0.8); }
+  }
+
+  /* Main Container */
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 14px;
+  }
+
+  .page {
+    display: none;
+    animation: fadeIn 0.22s ease;
+  }
+
+  .page.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::after {
+    content: "";
+    position: absolute;
+    top: 0; right: 0;
+    width: 60px; height: 60px;
+    background: radial-gradient(circle, rgba(0,229,255,0.12), transparent 70%);
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .stat-value {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  .stat-value.cyan { color: var(--accent); }
+  .stat-value.green { color: var(--success); }
+  .stat-value.amber { color: var(--warning); }
+
+  /* Card */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .badge-count {
+    background: rgba(0, 229, 255, 0.14);
+    color: var(--accent);
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  /* Form Controls */
+  .form-group {
+    margin-bottom: 10px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    background: var(--bg-dark);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: var(--text-main);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-family: 'Hind Siliguri', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input[type="range"] {
+    padding: 4px 0;
+    background: transparent;
+    border: none;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+  }
+
+  /* Slider / Picker Box */
+  .picker-box {
+    background: var(--bg-dark);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+  }
+
+  .picker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    font-size: 12px;
+  }
+
+  .picker-val {
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 13px;
+  }
+
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .mini-chip {
+    background: var(--bg-card-2);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 4px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Hind Siliguri', sans-serif;
+  }
+
+  .mini-chip.active, .mini-chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0, 229, 255, 0.12);
+  }
+
+  .schedule-preview {
+    background: rgba(0, 229, 255, 0.08);
+    border: 1px solid rgba(0, 229, 255, 0.25);
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--text-main);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .schedule-preview strong {
+    color: var(--accent);
+  }
+
+  /* Prize Breakdown Editor */
+  .prize-builder {
+    background: var(--bg-dark);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+
+  .prize-row {
+    display: grid;
+    grid-template-columns: 1.35fr 0.75fr 0.9fr auto;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .prize-row input {
+    padding: 7px 8px;
+    font-size: 12px;
+  }
+
+  .prize-summary-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+    padding-top: 8px;
+    border-top: 1px dashed rgba(255,255,255,0.1);
+  }
+
+  .prize-summary-bar b.ok { color: var(--success); }
+  .prize-summary-bar b.warn { color: var(--warning); }
+
+  /* Buttons */
+  .btn {
+    width: 100%;
+    border: none;
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Hind Siliguri', sans-serif;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: transform 0.12s, opacity 0.2s;
+  }
+
+  .btn:active {
+    transform: scale(0.98);
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #0099ff);
+    color: #04101c;
+  }
+
+  .btn-success {
+    background: var(--success);
+    color: #041a0d;
+    padding: 7px 10px;
+    font-size: 12px;
+    width: auto;
+  }
+
+  .btn-danger {
+    background: rgba(255, 23, 68, 0.16);
+    color: #ff6b88;
+    border: 1px solid rgba(255, 23, 68, 0.35);
+    padding: 7px 10px;
+    font-size: 12px;
+    width: auto;
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid rgba(0, 229, 255, 0.35);
+    padding: 7px 10px;
+    font-size: 12px;
+    width: auto;
+  }
+
+  /* Filter Pills */
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-bottom: 12px;
+  }
+
+  .filter-chip {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .filter-chip.active {
+    background: rgba(0, 229, 255, 0.16);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* List Items */
+  .item-box {
+    background: var(--bg-card-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+
+  .item-box.banned-card {
+    border-color: rgba(255, 23, 68, 0.45);
+    background: rgba(255, 23, 68, 0.06);
+  }
+
+  .item-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .item-title {
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  .item-meta {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .prize-tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .prize-pill {
+    background: rgba(0, 230, 118, 0.12);
+    border: 1px solid rgba(0, 230, 118, 0.28);
+    color: var(--success);
+    padding: 3px 8px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .tag-pending {
+    background: rgba(255, 171, 0, 0.16);
+    color: var(--warning);
+  }
+
+  .tag-approved {
+    background: rgba(0, 230, 118, 0.16);
+    color: var(--success);
+  }
+
+  .tag-rejected {
+    background: rgba(255, 23, 68, 0.16);
+    color: #ff6b88;
+  }
+
+  .tag-banned {
+    background: rgba(255, 23, 68, 0.24);
+    color: #ff5277;
+  }
+
+  .tag-mode {
+    background: rgba(124, 77, 255, 0.2);
+    color: #b388ff;
+  }
+
+  .action-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .room-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .room-inputs input {
+    padding: 7px 9px;
+    font-size: 12px;
+  }
+
+  /* Modal / Inline Editor */
+  .inline-editor {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* BG Preview */
+  .bg-preview-box {
+    width: 100%;
+    height: 165px;
+    border-radius: 12px;
+    border: 1px dashed rgba(0, 229, 255, 0.35);
+    background-color: var(--bg-dark);
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .bg-preview-label {
+    background: rgba(9, 13, 22, 0.78);
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* Bottom Nav */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(11, 16, 28, 0.96);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    padding: 6px 4px 10px;
+    z-index: 60;
+  }
+
+  .nav-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'Hind Siliguri', sans-serif;
+    cursor: pointer;
+    padding: 4px 0;
+  }
+
+  .nav-btn span.icon {
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  .nav-btn.active {
+    color: var(--accent);
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    top: 68px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: #1b2a4a;
+    color: #fff;
+    border: 1px solid var(--accent);
+    padding: 9px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.25s ease;
+    z-index: 100;
+    white-space: nowrap;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 24px 12px;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="brand">
+    <div class="brand-badge">1H</div>
+    <div>
+      <div class="brand-title">1 H TOUR ADMIN</div>
+      <div class="brand-sub">Control & Deposit Panel</div>
+    </div>
+  </div>
+  <div class="status-pill">
+    <span class="dot"></span>
+    <span>LIVE</span>
+  </div>
+</header>
+
+<div id="toast" class="toast">আপডেট সম্পন্ন হয়েছে</div>
+
+<main class="container">
+
+  <!-- TAB 1: DASHBOARD & DEPOSITS -->
+  <section id="page-deposits" class="page active">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">মোট অনুমোদিত ডিপোজিট</div>
+        <div class="stat-value green" id="stat-approved-amt">৳0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">মোট ডিপোজিটকারী (জন)</div>
+        <div class="stat-value cyan" id="stat-depositor-count">0 জন</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">পেন্ডিং রিকোয়েস্ট</div>
+        <div class="stat-value amber" id="stat-pending-count">0টি</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">অ্যাক্টিভ ম্যাচ / ব্যান</div>
+        <div class="stat-value" id="stat-match-count">0টি</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>নতুন ডিপোজিট এন্ট্রি যোগ করুন</span>
+      </div>
+      <form id="deposit-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>প্লেয়ারের নাম / ইউজার</label>
+            <input type="text" id="dep-player" placeholder="যেমন: Rifat FF" required>
+          </div>
+          <div class="form-group">
+            <label>ফ্রি ফায়ার UID</label>
+            <input type="text" id="dep-uid" placeholder="যেমন: 248910341" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>টাকার পরিমাণ (৳)</label>
+            <input type="number" id="dep-amount" placeholder="যেমন: 100" min="1" required>
+          </div>
+          <div class="form-group">
+            <label>পেমেন্ট মাধ্যম</label>
+            <select id="dep-method">
+              <option value="বিকাশ">বিকাশ (bKash)</option>
+              <option value="নগদ">নগদ (Nagad)</option>
+              <option value="রকেট">রকেট (Rocket)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>TrxID / রেফারেন্স নম্বর</label>
+          <input type="text" id="dep-trx" placeholder="যেমন: TX98412B" required>
+        </div>
+        <button type="submit" class="btn btn-primary">+ ডিপোজিট লিস্টে যুক্ত করুন</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>কে কত টাকা ডিপোজিট দিয়েছে</span>
+        <span class="badge-count" id="dep-list-badge">0</span>
+      </div>
+
+      <div class="filter-bar">
+        <button class="filter-chip active" data-filter="all" onclick="setDepositFilter('all', this)">সবগুলো</button>
+        <button class="filter-chip" data-filter="pending" onclick="setDepositFilter('pending', this)">পেন্ডিং</button>
+        <button class="filter-chip" data-filter="approved" onclick="setDepositFilter('approved', this)">অনুমোদিত</button>
+        <button class="filter-chip" data-filter="rejected" onclick="setDepositFilter('rejected', this)">বাতিল</button>
+      </div>
+
+      <div id="deposit-list"></div>
+    </div>
+  </section>
+
+  <!-- TAB 2: MATCHES & ROOM ID/PASS -->
+  <section id="page-matches" class="page">
+    <div class="card">
+      <div class="card-title">
+        <span>নতুন টুর্নামেন্ট ম্যাচ তৈরি করুন</span>
+      </div>
+      <form id="match-form">
+        <div class="form-group">
+          <label>ম্যাচের শিরোনাম</label>
+          <input type="text" id="match-title" placeholder="যেমন: Night BR Zone Push #12" required>
+        </div>
+        <div class="form-group">
+          <label>ম্যাচের ফটো (গ্যালারি থেকে অথবা Image URL)</label>
+          <input type="file" id="match-image-file" accept="image/*">
+          <input type="url" id="match-image-url" placeholder="অথবা https://example.com/match-photo.jpg" style="margin-top:8px">
+          <small style="color:var(--muted)">এখানে দেওয়া ছবি ইউজার অ্যাপের ম্যাচ কার্ডে দেখাবে।
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>মোড (শুধু BR ও লোন ওফ)</label>
+            <select id="match-mode">
+              <option value="BR ZONE PUSH">BR ZONE PUSH</option>
+              <option value="লোন ওফ">লোন ওফ</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>ম্যাপ</label>
+            <select id="match-map">
+              <option value="Bermuda">Bermuda</option>
+              <option value="Purgatory">Purgatory</option>
+              <option value="Random Map">Random Map</option>
+              <option value="Lone Wolf Arena">Lone Wolf Arena</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Real-Time Drag Date & Day Selector -->
+        <div class="picker-box">
+          <div class="picker-header">
+            <span>📅 তারিখ সিলেক্ট করুন (টেনে টেনে)</span>
+            <span class="picker-val" id="date-offset-label">আজ (২৩ Nov)</span>
+          </div>
+          <input type="range" id="match-date-slider" min="0" max="14" value="0" oninput="updateSchedulePreview()">
+
+          <div class="picker-header" style="margin-top:8px;">
+            <span>📆 কত দিন চলবে / কয় দিনের ম্যাচ</span>
+            <span class="picker-val" id="duration-days-label">১ দিন</span>
+          </div>
+          <input type="range" id="match-duration-slider" min="1" max="15" value="1" oninput="updateSchedulePreview()">
+
+          <div class="chip-row">
+            <button type="button" class="mini-chip active" onclick="setQuickSchedule(0, 1, this)">আজ • ১ দিন</button>
+            <button type="button" class="mini-chip" onclick="setQuickSchedule(1, 1, this)">আগামীকাল • ১ দিন</button>
+            <button type="button" class="mini-chip" onclick="setQuickSchedule(0, 3, this)">আজ থেকে ৩ দিন</button>
+            <button type="button" class="mini-chip" onclick="setQuickSchedule(0, 7, this)">আজ থেকে ৭ দিন</button>
+          </div>
+        </div>
+
+        <!-- Time Drag Selector -->
+        <div class="picker-box">
+          <div class="picker-header">
+            <span>⏰ ম্যাচ শুরুর সময় (স্লাইডার টেনে সিলেক্ট করুন)</span>
+            <span class="picker-val" id="time-slot-label">রাত ১০:০০ PM</span>
+          </div>
+          <input type="range" id="match-time-slider" min="0" max="47" value="44" oninput="updateSchedulePreview()">
+          <div class="chip-row">
+            <button type="button" class="mini-chip" onclick="setTimeSlot(28, this)">দুপুর ২:০০ PM</button>
+            <button type="button" class="mini-chip" onclick="setTimeSlot(36, this)">সন্ধ্যা ৬:০০ PM</button>
+            <button type="button" class="mini-chip" onclick="setTimeSlot(42, this)">রাত ৯:০০ PM</button>
+            <button type="button" class="mini-chip active" onclick="setTimeSlot(44, this)">রাত ১০:০০ PM</button>
+            <button type="button" class="mini-chip" onclick="setTimeSlot(46, this)">রাত ১১:০০ PM</button>
+          </div>
+        </div>
+
+        <div class="schedule-preview" id="schedule-preview-text">
+          <span>সিলেক্টেড সময়সূচি: <strong id="preview-schedule-val">আজ, ২৩ Nov (১ দিন) • রাত ১০:০০ PM</strong></span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>এন্ট্রি ফি (৳)</label>
+            <input type="number" id="match-fee" placeholder="30" value="30" min="0" required>
+          </div>
+          <div class="form-group">
+            <label>মোট প্রাইজ পুল (৳)</label>
+            <input type="number" id="match-prize" placeholder="500" value="500" min="0" oninput="refreshPrizeSummary('create')" required>
+          </div>
+        </div>
+
+        <!-- Custom Squad / Winner Prize Editor -->
+        <div class="prize-builder">
+          <div class="card-title" style="margin-bottom:8px; font-size:13px;">
+            <span>🏆 কতজন / কয়টা স্কোয়াডকে প্রাইজ দিবেন (এডিট করুন)</span>
+            <button type="button" class="btn btn-outline" style="padding:4px 8px; font-size:11px;" onclick="addPrizeRow('create')">+ পজিশন/স্কোয়াড যোগ</button>
+          </div>
+          <div id="create-prize-rows"></div>
+          <div class="prize-summary-bar" id="create-prize-summary"></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">+ ম্যাচ পাবলিশ করুন</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>ম্যাচ তালিকা, প্রাইজ ব্রেকডাউন ও Room ID / Pass</span>
+        <span class="badge-count" id="match-list-badge">0</span>
+      </div>
+      <div id="match-list"></div>
+    </div>
+  </section>
+
+  <!-- TAB 3: PLAYER BAN & LIVE NOTICE -->
+  <section id="page-notice" class="page">
+    <div class="card">
+      <div class="card-title">
+        <span>প্লেয়ার ব্যান (Ban / Unban Player)</span>
+        <span class="badge-count" id="ban-list-badge">0</span>
+      </div>
+      <form id="ban-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>প্লেয়ারের নাম</label>
+            <input type="text" id="ban-name" placeholder="যেমন: Hacker FF" required>
+          </div>
+          <div class="form-group">
+            <label>ফ্রি ফায়ার UID</label>
+            <input type="text" id="ban-uid" placeholder="যেমন: 998877665" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>ব্যান করার কারণ</label>
+          <input type="text" id="ban-reason" placeholder="যেমন: হ্যাক / প্যানেল ব্যবহার বা ফেক TrxID" required>
+        </div>
+        <button type="submit" class="btn btn-danger" style="width:100%; padding:10px;">🚫 প্লেয়ার ব্যান করুন</button>
+      </form>
+
+      <div id="banned-list" style="margin-top:12px;"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>ইউজার অ্যাপে লাইভ নোটিস পাঠান</span>
+      </div>
+      <form id="notice-form">
+        <div class="form-group">
+          <label>নোটিসের বার্তা</label>
+          <textarea id="notice-text" rows="2" placeholder="যেমন: Room ID ও Password দেওয়া হয়েছে। সবাই রুমে প্রবেশ করুন!" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>নোটিফিকেশন সাউন্ড</label>
+          <select id="notice-sound">
+            <option value="alert">অ্যালার্ট (জরুরি)</option>
+            <option value="bell">বেল</option>
+            <option value="double">ডাবল বিপ</option>
+            <option value="none">সাউন্ড বন্ধ</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">নোটিস পাঠান</button>
+      </form>
+      <div id="notice-list" style="margin-top:10px;"></div>
+    </div>
+
+    <div class="card" style="border-color:rgba(0,229,255,.35)">
+      <div class="card-title"><span>📲 একবারের নোটিশ (ইতিহাস ছাড়া)</span></div>
+      <form id="instant-notice-form">
+        <div class="form-group">
+          <label>শুধু ইউজার অ্যাপে পাঠানোর বার্তা</label>
+          <textarea id="instant-notice-text" rows="2" placeholder="যেমন: ম্যাচ শুরু হতে ৫ মিনিট বাকি!" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>নোটিফিকেশন সাউন্ড</label>
+          <select id="instant-notice-sound">
+            <option value="alert">অ্যালার্ট (জরুরি)</option>
+            <option value="bell">বেল</option>
+            <option value="double">ডাবল বিপ</option>
+            <option value="none">সাউন্ড বন্ধ</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">📤 এখনই পাঠান (ইতিহাস সেভ হবে না)</button>
+        <div class="item-meta" style="margin-top:8px">এটি পুরোনো নোটিশের তালিকায় যোগ হবে না। ইউজার অ্যাপ খোলা থাকলে কয়েক সেকেন্ডের মধ্যে দেখাবে।</div>
+      </form>
+    </div>
+  </section>
+
+  <!-- TAB 4: SETTINGS (USER APP BG PHOTO + FIREBASE) -->
+  <section id="page-settings" class="page">
+    <div class="card">
+      <div class="card-title">
+        <span>ইউজার অ্যাপের ব্যাকগ্রাউন্ড ফটো (BG Photo)</span>
+      </div>
+      <div class="bg-preview-box" id="user-bg-preview">
+        <span class="bg-preview-label" id="user-bg-label">ডিফল্ট ডার্ক ব্যাকগ্রাউন্ড</span>
+      </div>
+      <div class="form-group">
+        <label>ফোন গ্যালারি থেকে ছবি সিলেক্ট করুন</label>
+        <input type="file" id="bg-file-input" accept="image/*" onchange="handleBgFileUpload(event)">
+      </div>
+      <div class="form-group">
+        <label>অথবা ইমেজ লিংক (Image URL) দিন</label>
+        <input type="text" id="bg-url-input" placeholder="https://example.com/user-app-bg.jpg">
+      </div>
+      <div class="action-row">
+        <button type="button" class="btn btn-primary" style="flex:1" onclick="applyBgUrl()">BG ফটো সেভ করুন</button>
+        <button type="button" class="btn btn-outline" onclick="clearBgPhoto()">ডিফল্ট করুন</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>পেমেন্ট ও ওয়ালেট সেটিংস</span></div>
+      <div class="form-row">
+        <div class="form-group"><label>বিকাশ নম্বর</label><input type="tel" id="pay-bkash-number" placeholder="01XXXXXXXXX"></div>
+        <div class="form-group"><label>নগদ নম্বর</label><input type="tel" id="pay-nagad-number" placeholder="01XXXXXXXXX"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>রকেট নম্বর</label><input type="tel" id="pay-rocket-number" placeholder="01XXXXXXXXX"></div>
+        <div class="form-group"><label>সর্বনিম্ন ডিপোজিট (৳)</label><input type="number" id="min-deposit" min="1" placeholder="20"></div>
+      </div>
+      <div class="form-group"><label>সর্বনিম্ন উইথড্র (৳)</label><input type="number" id="min-withdraw" min="1" placeholder="50"></div>
+      <button type="button" class="btn btn-primary" style="width:100%" onclick="savePaymentSettings()">পেমেন্ট সেটিংস সেভ করুন</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>Firebase Realtime Database কানেকশন</span>
+      </div>
+      <div class="form-group">
+        <label>Database URL (asia-southeast1)</label>
+        <input type="text" id="fb-url" placeholder="https://your-project-default-rtdb.asia-southeast1.firebasedatabase.app">
+      </div>
+      <div class="form-group">
+        <label>অ্যাডমিন সিকিউরিটি কী / পিন</label>
+        <input type="text" id="fb-pin" placeholder="1H-ADMIN-2026">
+      </div>
+      <div class="action-row">
+        <button type="button" class="btn btn-primary" style="flex:1" onclick="saveSettings()">সেটিংস সেভ করুন</button>
+        <button type="button" class="btn btn-danger" onclick="resetDemoData()">ডেমো রিসেট</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-page="deposits" onclick="switchPage('deposits', this)">
+    <span class="icon">💰</span>
+    <span>ডিপোজিট</span>
+  </button>
+  <button class="nav-btn" data-page="matches" onclick="switchPage('matches', this)">
+    <span class="icon">🎮</span>
+    <span>ম্যাচ/রুম</span>
+  </button>
+  <button class="nav-btn" data-page="notice" onclick="switchPage('notice', this)">
+    <span class="icon">🚫</span>
+    <span>ব্যান/নোটিস</span>
+  </button>
+  <button class="nav-btn" data-page="settings" onclick="switchPage('settings', this)">
+    <span class="icon">⚙️</span>
+    <span>সেটিংস</span>
+  </button>
+</nav>
+
+<script>
+  const STORAGE_KEY = "fh_tour_admin_v3";
+  let currentDepositFilter = "all";
+  let editingMatchId = null;
+
+  const MONTHS_BN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const DAYS_BN = ["রবি", "সোম", "মঙ্গল", "বুধ", "বৃহঃ", "শুক্র", "শনি"];
+
+  function toBanglaDigits(str) {
+    const map = { "0": "০", "1": "১", "2": "২", "3": "৩", "4": "৪", "5": "৫", "6": "৬", "7": "৭", "8": "৮", "9": "৯" };
+    return String(str).replace(/[0-9]/g, ch => map[ch]);
+  }
+
+  function formatSlotTime(slotIndex) {
+    const totalMinutes = Number(slotIndex) * 30;
+    const hour24 = Math.floor(totalMinutes / 60);
+    const minute = totalMinutes % 60;
+    const period = hour24 >= 12 ? "PM" : "AM";
+    let hour12 = hour24 % 12;
+    if (hour12 === 0) hour12 = 12;
+
+    let partOfDay = "";
+    if (hour24 >= 5 && hour24 < 12) partOfDay = "সকাল ";
+    else if (hour24 >= 12 && hour24 < 17) partOfDay = "দুপুর ";
+    else if (hour24 >= 17 && hour24 < 19) partOfDay = "সন্ধ্যা ";
+    else partOfDay = "রাত ";
+
+    const hStr = toBanglaDigits(String(hour12).padStart(2, "0"));
+    const mStr = toBanglaDigits(String(minute).padStart(2, "0"));
+    return `${partOfDay}${hStr}:${mStr} ${period}`;
+  }
+
+  function formatDateFromOffset(offsetDays) {
+    const base = new Date();
+    base.setHours(0, 0, 0, 0);
+    base.setDate(base.getDate() + Number(offsetDays));
+    const dayName = DAYS_BN[base.getDay()];
+    const dateNum = toBanglaDigits(base.getDate());
+    const monthName = MONTHS_BN[base.getMonth()];
+    let rel = `${dayName}, ${dateNum} ${monthName}`;
+    if (Number(offsetDays) === 0) rel = `আজ (${dateNum} ${monthName})`;
+    else if (Number(offsetDays) === 1) rel = `আগামীকাল (${dateNum} ${monthName})`;
+    return rel;
+  }
+
+  function buildScheduleSummary(offsetDays, durationDays, slotIndex) {
+    const startDate = new Date();
+    startDate.setHours(0, 0, 0, 0);
+    startDate.setDate(startDate.getDate() + Number(offsetDays));
+
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + Math.max(1, Number(durationDays)) - 1);
+
+    const startLabel = formatDateFromOffset(offsetDays);
+    const endLabel = `${toBanglaDigits(endDate.getDate())} ${MONTHS_BN[endDate.getMonth()]}`;
+    const timeLabel = formatSlotTime(slotIndex);
+    const daysText = `${toBanglaDigits(durationDays)} দিন`;
+
+    const fullText = Number(durationDays) > 1
+      ? `${startLabel} – ${endLabel} (${daysText}) • ${timeLabel}`
+      : `${startLabel} (${daysText}) • ${timeLabel}`;
+
+    return {
+      offsetDays: Number(offsetDays),
+      durationDays: Number(durationDays),
+      slotIndex: Number(slotIndex),
+      startAt: startDate.getTime() + (Number(slotIndex) * 30 * 60 * 1000),
+      startLabel,
+      endLabel,
+      daysText,
+      timeLabel,
+      fullText
+    };
+  }
+
+  function updateSchedulePreview() {
+    const offset = document.getElementById("match-date-slider").value;
+    const duration = document.getElementById("match-duration-slider").value;
+    const slot = document.getElementById("match-time-slider").value;
+
+    const info = buildScheduleSummary(offset, duration, slot);
+    document.getElementById("date-offset-label").textContent = info.startLabel;
+    document.getElementById("duration-days-label").textContent = info.daysText;
+    document.getElementById("time-slot-label").textContent = info.timeLabel;
+    document.getElementById("preview-schedule-val").textContent = info.fullText;
+  }
+
+  function setQuickSchedule(offset, duration, btnEl) {
+    document.getElementById("match-date-slider").value = offset;
+    document.getElementById("match-duration-slider").value = duration;
+    if (btnEl && btnEl.parentElement) {
+      btnEl.parentElement.querySelectorAll(".mini-chip").forEach(c => c.classList.remove("active"));
+      btnEl.classList.add("active");
+    }
+    updateSchedulePreview();
+  }
+
+  function setTimeSlot(slot, btnEl) {
+    document.getElementById("match-time-slider").value = slot;
+    if (btnEl && btnEl.parentElement) {
+      btnEl.parentElement.querySelectorAll(".mini-chip").forEach(c => c.classList.remove("active"));
+      btnEl.classList.add("active");
+    }
+    updateSchedulePreview();
+  }
+
+  // Prize Rows Builder
+  let createPrizeItems = [
+    { label: "১ম স্কোয়াড (Booyah)", winnersCount: 1, amount: 250 },
+    { label: "২য় স্কোয়াড", winnersCount: 1, amount: 150 },
+    { label: "৩য় স্কোয়াড", winnersCount: 1, amount: 100 }
+  ];
+
+  let editPrizeItems = [];
+
+  function renderPrizeRows(mode) {
+    const containerId = mode === "create" ? "create-prize-rows" : "edit-prize-rows";
+    const items = mode === "create" ? createPrizeItems : editPrizeItems;
+    const el = document.getElementById(containerId);
+    if (!el) return;
+
+    if (!items.length) {
+      el.innerHTML = `<div class="empty-state" style="padding:10px;">কোনো প্রাইজ পজিশন নেই। নিচে বাটনে ক্লিক করে যোগ করুন।</div>`;
+    } else {
+      el.innerHTML = items.map((item, idx) => `
+        <div class="prize-row">
+          <input type="text" value="${escapeAttr(item.label)}" placeholder="যেমন: ১ম স্কোয়াড" oninput="updatePrizeField('${mode}', ${idx}, 'label', this.value)">
+          <input type="number" min="1" value="${item.winnersCount}" placeholder="কয়টা" title="কয়টা স্কোয়াড / জন" oninput="updatePrizeField('${mode}', ${idx}, 'winnersCount', this.value)">
+          <input type="number" min="0" value="${item.amount}" placeholder="৳ টাকা" title="প্রতিটি প্রাইজের টাকা" oninput="updatePrizeField('${mode}', ${idx}, 'amount', this.value)">
+          <button type="button" class="btn btn-danger" style="padding:7px 8px;" onclick="removePrizeRow('${mode}', ${idx})">✕</button>
+        </div>
+      `).join("");
+    }
+    refreshPrizeSummary(mode);
+  }
+
+  function escapeAttr(str) {
+    return String(str || "").replace(/"/g, "&quot;");
+  }
+
+  function addPrizeRow(mode) {
+    const arr = mode === "create" ? createPrizeItems : editPrizeItems;
+    const nextNum = arr.length + 1;
+    arr.push({ label: `${toBanglaDigits(nextNum)}ম স্কোয়াড`, winnersCount: 1, amount: 50 });
+    renderPrizeRows(mode);
+  }
+
+  function removePrizeRow(mode, idx) {
+    if (mode === "create") {
+      createPrizeItems.splice(idx, 1);
+    } else {
+      editPrizeItems.splice(idx, 1);
+    }
+    renderPrizeRows(mode);
+  }
+
+  function updatePrizeField(mode, idx, field, val) {
+    const arr = mode === "create" ? createPrizeItems : editPrizeItems;
+    if (!arr[idx]) return;
+    if (field === "label") arr[idx].label = val;
+    else if (field === "winnersCount") arr[idx].winnersCount = Math.max(1, Number(val) || 1);
+    else if (field === "amount") arr[idx].amount = Math.max(0, Number(val) || 0);
+    refreshPrizeSummary(mode);
+  }
+
+  function calcPrizeStats(items) {
+    let totalWinners = 0;
+    let totalAllocated = 0;
+    items.forEach(it => {
+      const cnt = Math.max(1, Number(it.winnersCount) || 1);
+      const amt = Math.max(0, Number(it.amount) || 0);
+      totalWinners += cnt;
+      totalAllocated += cnt * amt;
+    });
+    return { totalWinners, totalAllocated };
+  }
+
+  function refreshPrizeSummary(mode) {
+    const items = mode === "create" ? createPrizeItems : editPrizeItems;
+    const poolInputId = mode === "create" ? "match-prize" : "edit-match-prize";
+    const summaryId = mode === "create" ? "create-prize-summary" : "edit-prize-summary";
+    const summaryEl = document.getElementById(summaryId);
+    if (!summaryEl) return;
+
+    const poolAmt = Number(document.getElementById(poolInputId)?.value || 0);
+    const { totalWinners, totalAllocated } = calcPrizeStats(items);
+    const diffClass = totalAllocated <= poolAmt ? "ok" : "warn";
+
+    summaryEl.innerHTML = `
+      <span>মোট প্রাইজ পাবে: <b>${toBanglaDigits(totalWinners)} স্কোয়াড/জন</b></span>
+      <span>বন্টনকৃত প্রাইজ: <b class="${diffClass}">৳${totalAllocated}</b> / পুল ৳${poolAmt}</span>
+    `;
+  }
+
+  const defaultState = {
+    deposits: [
+      { id: 1, player: "Siam FF", uid: "194827361", amount: 150, method: "বিকাশ", trx: "BKS77412A", status: "approved", time: "আজ ০৭:১৫ PM" },
+      { id: 2, player: "Naimul Pro", uid: "309182745", amount: 50, method: "নগদ", trx: "NGD55219X", status: "pending", time: "আজ ০৮:১০ PM" },
+      { id: 3, player: "Tanjim Rush", uid: "881726354", amount: 100, method: "বিকাশ", trx: "BKS90124M", status: "approved", time: "আজ ০৮:৩৫ PM" },
+      { id: 4, player: "Rakib Lone", uid: "554433221", amount: 40, method: "নগদ", trx: "NGD11842Q", status: "pending", time: "আজ ০৮:৫০ PM" }
+    ],
+    matches: [
+      {
+        id: 101,
+        title: "BR Zone Push #24",
+        mode: "BR ZONE PUSH",
+        map: "Bermuda",
+        fee: 30,
+        prize: 500,
+        time: "আজ (২৩ Nov) (১ দিন) • রাত ১০:০০ PM",
+        schedule: { offsetDays: 0, durationDays: 1, slotIndex: 44 },
+        prizeBreakdown: [
+          { label: "১ম স্কোয়াড", winnersCount: 1, amount: 250 },
+          { label: "২য় স্কোয়াড", winnersCount: 1, amount: 150 },
+          { label: "৩য় স্কোয়াড", winnersCount: 1, amount: 100 }
+        ],
+        roomId: "8841209",
+        roomPass: "1122"
+      },
+      {
+        id: 102,
+        title: "Lone Wolf 1v1 Cup",
+        mode: "লোন ওফ",
+        map: "Lone Wolf Arena",
+        fee: 20,
+        prize: 150,
+        time: "আজ (২৩ Nov) (১ দিন) • রাত ১১:০০ PM",
+        schedule: { offsetDays: 0, durationDays: 1, slotIndex: 46 },
+        prizeBreakdown: [
+          { label: "১ম প্লেয়ার", winnersCount: 1, amount: 100 },
+          { label: "২য় প্লেয়ার", winnersCount: 1, amount: 50 }
+        ],
+        roomId: "",
+        roomPass: ""
+      }
+    ],
+    bannedPlayers: [
+      { id: 301, name: "Toxic Aimbot", uid: "776655443", reason: "হ্যাক / প্যানেল ব্যবহার", time: "গতকাল" }
+    ],
+    notices: [
+      { id: 201, text: "সবাই সঠিক UID দিয়ে রেজিস্ট্রেশন করুন। ম্যাচ শুরুর ১০ মিনিট আগে Room ID দেওয়া হবে।", time: "আজ ০৮:০০ PM" }
+    ],
+    userAppBg: "",
+    settings: {
+      fbUrl: "https://htour-1247c-default-rtdb.firebaseio.com",
+      fbPin: "1H-ADMIN-2026",
+      paymentNumbers: { bKash: "01700-112233", Nagad: "01800-445566", Rocket: "01900-778899" },
+      minDeposit: 20,
+      minWithdraw: 50
+    }
+  };
+
+  let state = loadState();
+
+  function loadState() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) return JSON.parse(saved);
+      const oldSaved = localStorage.getItem("fh_tour_admin_v2");
+      if (oldSaved) return JSON.parse(oldSaved);
+    } catch (e) {}
+    return JSON.parse(JSON.stringify(defaultState));
+  }
+
+  const FIREBASE_DATABASE_URL = "https://htour-1247c-default-rtdb.firebaseio.com";
+  const FIREBASE_STATE_PATH = "/1htour/adminState.json";
+  const FIREBASE_DEPOSIT_REQUESTS_PATH = "/1htour/depositRequests.json";
+  let firebaseCloudReady = false;
+  let depositRequestPollTimer = null;
+  let matchParticipants = {};
+  let matchParticipantsPollTimer = null;
+  let pendingMatchImage = "";
+
+  document.getElementById("match-image-file")?.addEventListener("change", function(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) { pendingMatchImage = ""; return; }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        const scale = Math.min(1, 1000 / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+        pendingMatchImage = canvas.toDataURL("image/jpeg", 0.72);
+        showToast("ম্যাচের ছবি প্রস্তুত হয়েছে—এখন ম্যাচ পাবলিশ করুন");
+      };
+      img.onerror = () => showToast("ছবিটি পড়া যায়নি");
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  async function refreshMatchParticipants() {
+    try {
+      const response = await fetch(FIREBASE_DATABASE_URL + "/1htour/matchParticipants.json", { cache: "no-store" });
+      if (!response.ok) throw new Error("Match participants read failed");
+      matchParticipants = await response.json() || {};
+      renderMatches();
+    } catch (error) { console.warn("Match participant sync:", error); }
+  }
+  function startMatchParticipantsSync() {
+    refreshMatchParticipants();
+    if (matchParticipantsPollTimer) clearInterval(matchParticipantsPollTimer);
+    matchParticipantsPollTimer = setInterval(refreshMatchParticipants, 3500);
+  }
+
+  async function refreshUserDepositRequests() {
+    try {
+      const response = await fetch(FIREBASE_DATABASE_URL + FIREBASE_DEPOSIT_REQUESTS_PATH, { cache: "no-store" });
+      if (!response.ok) throw new Error("Deposit request read failed");
+      const requests = await response.json() || {};
+      const cloudItems = Object.entries(requests).map(([key, r]) => ({
+        id: String(r.id || key),
+        requestId: String(r.id || key),
+        source: "user",
+        player: r.player || r.email || "User",
+        uid: r.gameUid || r.uid || "",
+        email: r.email || "",
+        amount: Number(r.amount || 0),
+        method: r.method || "",
+        trx: r.trx || "",
+        status: r.status || "pending",
+        time: r.time || "এইমাত্র"
+      }));
+      const cloudIds = new Set(cloudItems.map(x => String(x.id)));
+      state.deposits = state.deposits.filter(d => d.source !== "user" || cloudIds.has(String(d.id)));
+      cloudItems.forEach(cloudItem => {
+        const index = state.deposits.findIndex(d => String(d.id) === String(cloudItem.id));
+        if (index >= 0) state.deposits[index] = { ...state.deposits[index], ...cloudItem };
+        else state.deposits.unshift(cloudItem);
+      });
+      renderStats();
+      renderDeposits();
+    } catch (error) {
+      console.warn("Deposit request sync:", error);
+    }
+  }
+
+  function startDepositRequestSync() {
+    refreshUserDepositRequests();
+    if (depositRequestPollTimer) clearInterval(depositRequestPollTimer);
+    depositRequestPollTimer = setInterval(refreshUserDepositRequests, 3500);
+  }
+  let firebaseWriteQueue = Promise.resolve();
+
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {
+      showToast("ছবি বড় হওয়ায় লোকাল স্টোরেজে সেভ হয়নি, URL দিন");
+    }
+    if (!firebaseCloudReady) return;
+    const snapshot = JSON.parse(JSON.stringify(state));
+    firebaseWriteQueue = firebaseWriteQueue.then(async () => {
+      const response = await fetch(FIREBASE_DATABASE_URL + FIREBASE_STATE_PATH, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(snapshot)
+      });
+      if (!response.ok) throw new Error("Firebase save failed: " + response.status);
+    }).catch(error => {
+      console.error("Firebase sync error:", error);
+      showToast("Firebase-এ সেভ হয়নি — Database Rules/ইন্টারনেট দেখুন");
+    });
+  }
+
+  async function initializeCloudSync() {
+    try {
+      const response = await fetch(FIREBASE_DATABASE_URL + FIREBASE_STATE_PATH, { cache: "no-store" });
+      if (!response.ok) throw new Error("Firebase read failed: " + response.status);
+      const cloudState = await response.json();
+      if (cloudState && typeof cloudState === "object" && Array.isArray(cloudState.matches)) {
+        state = { ...state, ...cloudState };
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+      }
+      firebaseCloudReady = true;
+      if (!cloudState) saveState();
+      loadSettingsToForm();
+      renderAll();
+      showToast("Firebase সংযোগ সফল — ডেটা সিঙ্ক হচ্ছে");
+      startDepositRequestSync();
+      startMatchParticipantsSync();
+    } catch (error) {
+      console.error("Firebase initialization error:", error);
+      firebaseCloudReady = false;
+      renderAll();
+      startDepositRequestSync();
+      startMatchParticipantsSync();
+      showToast("Firebase সংযোগ হয়নি — Database Rules/ইন্টারনেট দেখুন");
+    }
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
+  }
+
+  function switchPage(pageId, btnEl) {
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    document.getElementById("page-" + pageId).classList.add("active");
+    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+    if (btnEl) btnEl.classList.add("active");
+    renderAll();
+  }
+
+  function setDepositFilter(filter, chipEl) {
+    currentDepositFilter = filter;
+    document.querySelectorAll(".filter-chip").forEach(c => c.classList.remove("active"));
+    if (chipEl) chipEl.classList.add("active");
+    renderDeposits();
+  }
+
+  // Deposits
+  document.getElementById("deposit-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const player = document.getElementById("dep-player").value.trim();
+    const uid = document.getElementById("dep-uid").value.trim();
+    const amount = Number(document.getElementById("dep-amount").value);
+    const method = document.getElementById("dep-method").value;
+    const trx = document.getElementById("dep-trx").value.trim();
+
+    if (!player || !uid || !amount || !trx) return;
+
+    state.deposits.unshift({
+      id: Date.now(),
+      player, uid, amount, method, trx,
+      status: "approved",
+      time: "এইমাত্র"
+    });
+    saveState();
+    this.reset();
+    renderAll();
+    showToast("ডিপোজিট রেকর্ড যোগ করা হয়েছে");
+  });
+
+  async function updateDepositStatus(id, newStatus) {
+    const item = state.deposits.find(d => String(d.id) === String(id));
+    if (!item) return;
+    if (item.requestId || item.source === "user") {
+      try {
+        const requestId = item.requestId || item.id;
+        const requestUrl = FIREBASE_DATABASE_URL + "/1htour/depositRequests/" + encodeURIComponent(String(requestId)) + ".json";
+        const read = await fetch(requestUrl, { cache: "no-store" });
+        if (!read.ok) throw new Error("রিকোয়েস্ট পড়া যায়নি");
+        const cloudRequest = await read.json();
+        if (!cloudRequest) throw new Error("ডিপোজিট রিকোয়েস্ট পাওয়া যায়নি");
+        if (newStatus === "approved" && cloudRequest.status !== "approved") {
+          const profileUrl = FIREBASE_DATABASE_URL + "/1htour/users/" + encodeURIComponent(cloudRequest.uid) + ".json";
+          const profileRead = await fetch(profileUrl, { cache: "no-store" });
+          if (!profileRead.ok) throw new Error("ইউজার ব্যালেন্স পড়া যায়নি");
+          const profile = await profileRead.json() || {};
+          const currentBalance = Number(profile.user?.balance || 0);
+          const newBalance = currentBalance + Number(cloudRequest.amount || item.amount || 0);
+          const balanceWrite = await fetch(FIREBASE_DATABASE_URL + "/1htour/users/" + encodeURIComponent(cloudRequest.uid) + "/user/balance.json", {
+            method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(newBalance)
+          });
+          if (!balanceWrite.ok) throw new Error("ইউজার ব্যালেন্স আপডেট হয়নি");
+        }
+        cloudRequest.status = newStatus;
+        cloudRequest.reviewedAt = Date.now();
+        const write = await fetch(requestUrl, {
+          method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(cloudRequest)
+        });
+        if (!write.ok) throw new Error("রিকোয়েস্ট স্ট্যাটাস সেভ হয়নি");
+      } catch (error) {
+        console.error(error);
+        showToast(error.message || "Firebase আপডেট হয়নি");
+        return;
+      }
+    }
+    item.status = newStatus;
+    saveState();
+    renderAll();
+    showToast(newStatus === "approved" ? "ডিপোজিট অনুমোদিত হয়েছে" : "ডিপোজিট বাতিল করা হয়েছে");
+  }
+
+  function deleteDeposit(id) {
+    const item = state.deposits.find(d => String(d.id) === String(id));
+    if (item && (item.requestId || item.source === "user")) {
+      const requestId = item.requestId || item.id;
+      fetch(FIREBASE_DATABASE_URL + "/1htour/depositRequests/" + encodeURIComponent(String(requestId)) + ".json", { method: "DELETE" })
+        .catch(error => console.warn("Delete deposit request:", error));
+    }
+    state.deposits = state.deposits.filter(d => String(d.id) !== String(id));
+    saveState();
+    renderAll();
+    showToast("ডিপোজিট এন্ট্রি মুছে ফেলা হয়েছে");
+  }
+
+  function quickBanFromDeposit(player, uid) {
+    const exists = state.bannedPlayers.some(b => b.uid === uid);
+    if (!exists) {
+      state.bannedPlayers.unshift({
+        id: Date.now(),
+        name: player,
+        uid: uid,
+        reason: "ডিপোজিট / পেমেন্ট নিয়ম ভঙ্গ",
+        time: "এইমাত্র"
+      });
+      saveState();
+    }
+    renderAll();
+    showToast(`${player} (UID: ${uid}) ব্যান করা হয়েছে`);
+  }
+
+  // Matches
+  document.getElementById("match-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const title = document.getElementById("match-title").value.trim();
+    const mode = document.getElementById("match-mode").value;
+    const map = document.getElementById("match-map").value;
+    const fee = Number(document.getElementById("match-fee").value);
+    const prize = Number(document.getElementById("match-prize").value);
+
+    const offset = Number(document.getElementById("match-date-slider").value);
+    const duration = Number(document.getElementById("match-duration-slider").value);
+    const slot = Number(document.getElementById("match-time-slider").value);
+    const sched = buildScheduleSummary(offset, duration, slot);
+
+    const cleanedPrizes = createPrizeItems
+      .filter(p => (p.label || "").trim() !== "")
+      .map(p => ({
+        label: p.label.trim(),
+        winnersCount: Math.max(1, Number(p.winnersCount) || 1),
+        amount: Math.max(0, Number(p.amount) || 0)
+      }));
+
+    state.matches.unshift({
+      id: Date.now(),
+      title,
+      mode,
+      map,
+      image: document.getElementById("match-image-url").value.trim() || pendingMatchImage,
+      fee,
+      prize,
+      time: sched.fullText,
+      schedule: { offsetDays: offset, durationDays: duration, slotIndex: slot, startAt: sched.startAt },
+      prizeBreakdown: cleanedPrizes,
+      roomId: "",
+      roomPass: ""
+    });
+    saveState();
+    this.reset();
+    document.getElementById("match-image-url").value = "";
+    document.getElementById("match-image-file").value = "";
+    pendingMatchImage = "";
+    document.getElementById("match-fee").value = 30;
+    document.getElementById("match-prize").value = 500;
+    document.getElementById("match-date-slider").value = 0;
+    document.getElementById("match-duration-slider").value = 1;
+    document.getElementById("match-time-slider").value = 44;
+    updateSchedulePreview();
+    createPrizeItems = [
+      { label: "১ম স্কোয়াড", winnersCount: 1, amount: 250 },
+      { label: "২য় স্কোয়াড", winnersCount: 1, amount: 150 },
+      { label: "৩য় স্কোয়াড", winnersCount: 1, amount: 100 }
+    ];
+    renderPrizeRows("create");
+    renderAll();
+    showToast("নতুন ম্যাচ যুক্ত হয়েছে");
+  });
+
+  function toggleEditMatch(matchId) {
+    if (editingMatchId === matchId) {
+      editingMatchId = null;
+      renderMatches();
+      return;
+    }
+    const m = state.matches.find(x => x.id === matchId);
+    if (!m) return;
+    editingMatchId = matchId;
+    editPrizeItems = JSON.parse(JSON.stringify(m.prizeBreakdown || []));
+    renderMatches();
+    renderPrizeRows("edit");
+  }
+
+  function saveEditedMatch(matchId) {
+    const m = state.matches.find(x => x.id === matchId);
+    if (!m) return;
+
+    const title = document.getElementById("edit-match-title").value.trim();
+    const prize = Number(document.getElementById("edit-match-prize").value || m.prize);
+    const fee = Number(document.getElementById("edit-match-fee").value || m.fee);
+    const offset = Number(document.getElementById("edit-date-slider").value);
+    const duration = Number(document.getElementById("edit-duration-slider").value);
+    const slot = Number(document.getElementById("edit-time-slider").value);
+    const sched = buildScheduleSummary(offset, duration, slot);
+
+    if (title) m.title = title;
+    m.fee = fee;
+    m.prize = prize;
+    m.schedule = { offsetDays: offset, durationDays: duration, slotIndex: slot, startAt: sched.startAt };
+    m.time = sched.fullText;
+    m.prizeBreakdown = editPrizeItems
+      .filter(p => (p.label || "").trim() !== "")
+      .map(p => ({
+        label: p.label.trim(),
+        winnersCount: Math.max(1, Number(p.winnersCount) || 1),
+        amount: Math.max(0, Number(p.amount) || 0)
+      }));
+
+    editingMatchId = null;
+    saveState();
+    renderAll();
+    showToast("ম্যাচ ও প্রাইজ লিস্ট এডিট সেভ হয়েছে");
+  }
+
+  function updateEditSchedulePreview() {
+    const offset = document.getElementById("edit-date-slider")?.value ?? 0;
+    const duration = document.getElementById("edit-duration-slider")?.value ?? 1;
+    const slot = document.getElementById("edit-time-slider")?.value ?? 44;
+    const info = buildScheduleSummary(offset, duration, slot);
+    const lbl = document.getElementById("edit-schedule-preview");
+    if (lbl) lbl.textContent = info.fullText;
+  }
+
+  const prizeAwardLocks = new Set();
+
+  async function awardMatchPrize(matchId, authUid) {
+    const lockKey = String(matchId) + ":" + String(authUid);
+    if (prizeAwardLocks.has(lockKey)) return;
+    const input = document.getElementById("prize-" + matchId + "-" + authUid);
+    const amount = Number(input?.value || 0);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      showToast("সঠিক প্রাইজের পরিমাণ লিখুন");
+      return;
+    }
+    const participant = matchParticipants[String(matchId)]?.[String(authUid)];
+    if (!participant) {
+      showToast("প্লেয়ারের তথ্য পাওয়া যায়নি");
+      return;
+    }
+    if (participant.prizePaid) {
+      showToast("এই প্লেয়ারকে প্রাইজ দেওয়া হয়েছে");
+      return;
+    }
+    if (!confirm("এই প্লেয়ারকে ৳" + amount + " প্রাইজ দিতে চান?")) return;
+    prizeAwardLocks.add(lockKey);
+    if (input) input.disabled = true;
+    try {
+      const profileUrl = FIREBASE_DATABASE_URL + "/1htour/users/" + encodeURIComponent(String(authUid)) + ".json";
+      const read = await fetch(profileUrl, { cache: "no-store" });
+      if (!read.ok) throw new Error("ইউজারের অ্যাকাউন্ট পড়া যায়নি");
+      const profile = await read.json();
+      if (!profile || !profile.user) throw new Error("ইউজারের ওয়ালেট পাওয়া যায়নি");
+      const currentBalance = Number(profile.user.balance || 0);
+      const currentTotalWon = Number(profile.user.totalWon || 0);
+      const walletWrite = await fetch(FIREBASE_DATABASE_URL + "/1htour/users/" + encodeURIComponent(String(authUid)) + "/user.json", {
+        method: "PATCH", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ balance: currentBalance + amount, totalWon: currentTotalWon + amount })
+      });
+      if (!walletWrite.ok) throw new Error("ব্যালেন্স আপডেট হয়নি");
+      const tx = Array.isArray(profile.transactions) ? profile.transactions : [];
+      tx.unshift({ id: "prize_" + matchId + "_" + Date.now(), type: "prize", amount, status: "প্রাইজ পেয়েছেন", date: new Date().toLocaleString("bn-BD"), matchId: String(matchId) });
+      const txWrite = await fetch(FIREBASE_DATABASE_URL + "/1htour/users/" + encodeURIComponent(String(authUid)) + "/transactions.json", {
+        method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(tx)
+      });
+      if (!txWrite.ok) throw new Error("প্রাইজ লেনদেনের রেকর্ড সেভ হয়নি");
+      const participantUrl = FIREBASE_DATABASE_URL + "/1htour/matchParticipants/" + encodeURIComponent(String(matchId)) + "/" + encodeURIComponent(String(authUid)) + ".json";
+      const participantWrite = await fetch(participantUrl, {
+        method: "PATCH", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prizePaid: true, prizeAmount: amount, prizePaidAt: Date.now() })
+      });
+      if (!participantWrite.ok) throw new Error("প্রাইজ দেওয়া হয়েছে, কিন্তু পেমেন্ট স্ট্যাটাস সেভ হয়নি");
+      participant.prizePaid = true;
+      participant.prizeAmount = amount;
+      renderMatches();
+      showToast("প্রাইজ ৳" + amount + " ইউজারের ব্যালেন্সে যোগ হয়েছে");
+    } catch (error) {
+      console.error("Prize payout error:", error);
+      showToast(error.message || "প্রাইজ দেওয়া যায়নি");
+      if (input) input.disabled = false;
+    } finally {
+      prizeAwardLocks.delete(lockKey);
+    }
+  }
+
+  function saveRoomCredentials(matchId) {
+    const rid = document.getElementById("rid-" + matchId).value.trim();
+    const rpass = document.getElementById("rpass-" + matchId).value.trim();
+    const m = state.matches.find(x => x.id === matchId);
+    if (!m) return;
+    m.roomId = rid;
+    m.roomPass = rpass;
+    saveState();
+    renderMatches();
+    showToast("Room ID ও Password সেভ হয়েছে");
+  }
+
+  function deleteMatch(matchId) {
+    if (editingMatchId === matchId) editingMatchId = null;
+    state.matches = state.matches.filter(x => x.id !== matchId);
+    saveState();
+    renderAll();
+    showToast("ম্যাচ ডিলিট করা হয়েছে");
+  }
+
+  // One-time notice: separate Firebase path, never appended to adminState.notices.
+  document.getElementById("instant-notice-form").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const message = document.getElementById("instant-notice-text").value.trim();
+    const sound = document.getElementById("instant-notice-sound").value || "alert";
+    if (!message) return;
+    if (!firebaseCloudReady) {
+      showToast("Firebase সংযোগ নেই — আগে সংযোগ ঠিক করুন");
+      return;
+    }
+    const button = this.querySelector('button[type="submit"]');
+    button.disabled = true;
+    try {
+      const payload = { id: String(Date.now()), text: message, sound, sentAt: Date.now() };
+      const response = await fetch(FIREBASE_DATABASE_URL + "/1htour/instantNotice.json", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) throw new Error("Firebase-এ পাঠানো যায়নি: " + response.status);
+      this.reset();
+      showToast("একবারের নোটিশ পাঠানো হয়েছে");
+    } catch (error) {
+      console.error("Instant notice send error:", error);
+      showToast("নোটিশ পাঠানো যায়নি — Firebase Rules/ইন্টারনেট দেখুন");
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  // Ban Player
+  document.getElementById("ban-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const name = document.getElementById("ban-name").value.trim();
+    const uid = document.getElementById("ban-uid").value.trim();
+    const reason = document.getElementById("ban-reason").value.trim();
+    if (!name || !uid) return;
+
+    state.bannedPlayers.unshift({
+      id: Date.now(),
+      name, uid, reason,
+      time: "এইমাত্র"
+    });
+    saveState();
+    this.reset();
+    renderAll();
+    showToast("প্লেয়ার ব্যান লিস্টে যুক্ত হয়েছে");
+  });
+
+  function unbanPlayer(id) {
+    state.bannedPlayers = state.bannedPlayers.filter(b => b.id !== id);
+    saveState();
+    renderAll();
+    showToast("প্লেয়ার আনব্যান করা হয়েছে");
+  }
+
+  // Notice
+  document.getElementById("notice-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const text = document.getElementById("notice-text").value.trim();
+    if (!text) return;
+    const sound = document.getElementById("notice-sound")?.value || "alert";
+    state.notices.unshift({
+      id: Date.now(),
+      text,
+      sound,
+      time: "এইমাত্র"
+    });
+    saveState();
+    this.reset();
+    renderNotices();
+    showToast("লাইভ নোটিস আপডেট হয়েছে");
+  });
+
+  // User App BG Photo
+  function renderBgPreview() {
+    const box = document.getElementById("user-bg-preview");
+    const label = document.getElementById("user-bg-label");
+    if (state.userAppBg) {
+      box.style.backgroundImage = `url('${state.userAppBg}')`;
+      label.textContent = "ইউজার অ্যাপ BG ফটো সেট করা আছে";
+    } else {
+      box.style.backgroundImage = "none";
+      label.textContent = "ডিফল্ট ডার্ক ব্যাকগ্রাউন্ড";
+    }
+  }
+
+  function handleBgFileUpload(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        const maxSide = 1000, scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+        state.userAppBg = canvas.toDataURL("image/jpeg", 0.72);
+        saveState(); renderBgPreview(); showToast("কমপ্রেস করে BG ফটো সেভ হয়েছে");
+      };
+      img.onerror = () => showToast("ছবিটি পড়া যায়নি");
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function applyBgUrl() {
+    const url = document.getElementById("bg-url-input").value.trim();
+    if (!url) {
+      showToast("একটি ইমেজ লিংক দিন");
+      return;
+    }
+    state.userAppBg = url;
+    saveState();
+    renderBgPreview();
+    showToast("ইউজার অ্যাপ BG ফটো সেভ হয়েছে");
+  }
+
+  function clearBgPhoto() {
+    state.userAppBg = "";
+    document.getElementById("bg-url-input").value = "";
+    saveState();
+    renderBgPreview();
+    showToast("ডিফল্ট ব্যাকগ্রাউন্ড রিসেট হয়েছে");
+  }
+
+  // Settings
+  function saveSettings() {
+    state.settings.fbUrl = document.getElementById("fb-url").value.trim();
+    state.settings.fbPin = document.getElementById("fb-pin").value.trim();
+    saveState();
+    showToast("সেটিংস সেভ করা হয়েছে");
+  }
+
+  function savePaymentSettings() {
+    state.settings = state.settings || {};
+    state.settings.paymentNumbers = {
+      bKash: document.getElementById("pay-bkash-number").value.trim(),
+      Nagad: document.getElementById("pay-nagad-number").value.trim(),
+      Rocket: document.getElementById("pay-rocket-number").value.trim()
+    };
+    state.settings.minDeposit = Math.max(1, Number(document.getElementById("min-deposit").value) || 20);
+    state.settings.minWithdraw = Math.max(1, Number(document.getElementById("min-withdraw").value) || 50);
+    saveState();
+    showToast("পেমেন্ট নম্বর ও লিমিট Firebase-এ সেভ হয়েছে");
+  }
+
+  function resetDemoData() {
+    state = JSON.parse(JSON.stringify(defaultState));
+    saveState();
+    loadSettingsToForm();
+    renderAll();
+    showToast("ডেমো ডেটা রিসেট করা হয়েছে");
+  }
+
+  function loadSettingsToForm() {
+    document.getElementById("fb-url").value = state.settings.fbUrl || "";
+    document.getElementById("fb-pin").value = state.settings.fbPin || "";
+    const ps = state.settings || {};
+    const pn = ps.paymentNumbers || {};
+    document.getElementById("pay-bkash-number").value = pn.bKash || "";
+    document.getElementById("pay-nagad-number").value = pn.Nagad || "";
+    document.getElementById("pay-rocket-number").value = pn.Rocket || "";
+    document.getElementById("min-deposit").value = ps.minDeposit ?? 20;
+    document.getElementById("min-withdraw").value = ps.minWithdraw ?? 50;
+    if (state.userAppBg && !state.userAppBg.startsWith("data:")) {
+      document.getElementById("bg-url-input").value = state.userAppBg;
+    }
+  }
+
+  function isUidBanned(uid) {
+    return state.bannedPlayers.some(b => String(b.uid) === String(uid));
+  }
+
+  function renderStats() {
+    const approvedSum = state.deposits
+      .filter(d => d.status === "approved")
+      .reduce((acc, d) => acc + Number(d.amount), 0);
+
+    const uniqueDepositors = new Set(
+      state.deposits.filter(d => d.status !== "rejected").map(d => d.uid || d.player)
+    ).size;
+
+    const pendingCount = state.deposits.filter(d => d.status === "pending").length;
+
+    document.getElementById("stat-approved-amt").textContent = "৳" + approvedSum;
+    document.getElementById("stat-depositor-count").textContent = uniqueDepositors + " জন";
+    document.getElementById("stat-pending-count").textContent = pendingCount + "টি";
+    document.getElementById("stat-match-count").textContent = `${state.matches.length} ম্যাচ / ${state.bannedPlayers.length} ব্যান`;
+    document.getElementById("dep-list-badge").textContent = state.deposits.length;
+    document.getElementById("match-list-badge").textContent = state.matches.length;
+    document.getElementById("ban-list-badge").textContent = state.bannedPlayers.length;
+  }
+
+  function renderDeposits() {
+    const listEl = document.getElementById("deposit-list");
+    const filtered = state.deposits.filter(d =>
+      currentDepositFilter === "all" ? true : d.status === currentDepositFilter
+    );
+
+    if (!filtered.length) {
+      listEl.innerHTML = `<div class="empty-state">এই ফিল্টারে কোনো ডিপোজিট রেকর্ড নেই।</div>`;
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(d => {
+      const statusLabel = d.status === "approved" ? "অনুমোদিত" : d.status === "rejected" ? "বাতিল" : "পেন্ডিং";
+      const statusClass = d.status === "approved" ? "tag-approved" : d.status === "rejected" ? "tag-rejected" : "tag-pending";
+      const banned = isUidBanned(d.uid);
+
+      return `
+        <div class="item-box ${banned ? "banned-card" : ""}">
+          <div class="item-top">
+            <div>
+              <div class="item-title">
+                ${d.player} — <span style="color:var(--success)">৳${d.amount}</span>
+                ${banned ? `<span class="tag tag-banned">BANNED</span>` : ""}
+              </div>
+              <div class="item-meta">UID: ${d.uid} • মাধ্যম: ${d.method} • TrxID: <b>${d.trx}</b></div>
+              <div class="item-meta">সময়: ${d.time}</div>
+              ${d.email ? `<div class="item-meta">Gmail: ${d.email}</div>` : ""}
+            </div>
+            <span class="tag ${statusClass}">${statusLabel}</span>
+          </div>
+          <div class="action-row">
+            ${d.status !== "approved" ? `<button class="btn btn-success" onclick="updateDepositStatus('${String(d.id).replace(/\\/g, "\\\\").replace(/'/g, "\\'")}', 'approved')">✓ Approve</button>` : ""}
+            ${d.status !== "rejected" ? `<button class="btn btn-outline" onclick="updateDepositStatus('${String(d.id).replace(/\\/g, "\\\\").replace(/'/g, "\\'")}', 'rejected')">✕ Reject</button>` : ""}
+            ${!banned ? `<button class="btn btn-danger" onclick="quickBanFromDeposit('${String(d.player || "").replace(/'/g, "\\'")}', '${String(d.uid || "")}')">🚫 ব্যান</button>` : ""}
+            <button class="btn btn-danger" onclick="deleteDeposit(${JSON.stringify(String(d.id))})">ডিলিট</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function renderMatches() {
+    const listEl = document.getElementById("match-list");
+    if (!state.matches.length) {
+      listEl.innerHTML = `<div class="empty-state">কোনো ম্যাচ তৈরি করা হয়নি।</div>`;
+      return;
+    }
+
+    listEl.innerHTML = state.matches.map(m => {
+      const prizes = Array.isArray(m.prizeBreakdown) ? m.prizeBreakdown : [];
+      const prizeHtml = prizes.length
+        ? `<div class="prize-tags-list">${prizes.map(p =>
+            `<span class="prize-pill">${p.label} (${toBanglaDigits(p.winnersCount)}): ৳${p.amount}</span>`
+          ).join("")}</div>`
+        : "";
+
+      const isEditing = editingMatchId === m.id;
+      const schedObj = m.schedule || { offsetDays: 0, durationDays: 1, slotIndex: 44 };
+      const participantMap = matchParticipants[String(m.id)] || {};
+      const participantEntries = Object.entries(participantMap);
+      const joinedPlayerCount = participantEntries.reduce((sum, entry) => sum + (entry[1]?.mode === "SQUAD" ? 4 : entry[1]?.mode === "DUO" ? 2 : 1), 0);
+      const participantHtml = participantEntries.length ? participantEntries.map(([authUid, p], idx) => {
+        const ffNames = Array.isArray(p.playerNames) ? p.playerNames.filter(Boolean).join(" / ") : (p.playerNames || p.freeFireName || p.ffName || "");
+        const paid = !!p.prizePaid;
+        return `<div class="item-box" style="padding:10px;margin:8px 0;border:1px solid var(--border)">
+          <div class="item-meta" style="font-weight:800;color:var(--text)">${idx + 1}. ${escapeAttr(p.name || p.email || "Player")}</div>
+          <div class="item-meta">Free Fire নাম: <b>${escapeAttr(ffNames || "নাম পাওয়া যায়নি")}</b></div>
+          <div class="item-meta">Game UID: <b>${escapeAttr(p.gameUid || "নেই")}</b></div>
+          <div class="item-meta">Auth UID: <b>${escapeAttr(authUid)}</b></div>
+          <div class="room-inputs" style="margin-top:8px">
+            <input type="number" min="1" step="1" id="prize-${String(m.id)}-${escapeAttr(authUid)}" placeholder="প্রাইজ টাকা" ${paid ? "disabled" : ""}>
+            <button class="btn ${paid ? "btn-outline" : "btn-success"}" ${paid ? "disabled" : ""} onclick="awardMatchPrize('${String(m.id)}','${String(authUid)}')">${paid ? "✓ প্রাইজ দেওয়া হয়েছে ৳" + Number(p.prizeAmount || 0) : "প্রাইজ দিন"}</button>
+          </div>
+        </div>`;
+      }).join("") : `<div class="item-meta">এখনো কেউ জয়েন করেনি।</div>`;
+
+      const editBoxHtml = isEditing ? `
+        <div class="inline-editor">
+          <div class="form-group">
+            <label>ম্যাচের নাম এডিট</label>
+            <input type="text" id="edit-match-title" value="${escapeAttr(m.title)}">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>এন্ট্রি ফি (৳)</label>
+              <input type="number" id="edit-match-fee" value="${m.fee}">
+            </div>
+            <div class="form-group">
+              <label>মোট প্রাইজ পুল (৳)</label>
+              <input type="number" id="edit-match-prize" value="${m.prize}" oninput="refreshPrizeSummary('edit')">
+            </div>
+          </div>
+          <div class="picker-box">
+            <div class="picker-header">
+              <span>তারিখ ও কত দিন (স্লাইডার)</span>
+              <span class="picker-val" id="edit-schedule-preview">${m.time}</span>
+            </div>
+            <label>তারিখ অফসেট (০ = আজ)</label>
+            <input type="range" id="edit-date-slider" min="0" max="14" value="${schedObj.offsetDays}" oninput="updateEditSchedulePreview()">
+            <label>কত দিন</label>
+            <input type="range" id="edit-duration-slider" min="1" max="15" value="${schedObj.durationDays}" oninput="updateEditSchedulePreview()">
+            <label>সময় (স্লট)</label>
+            <input type="range" id="edit-time-slider" min="0" max="47" value="${schedObj.slotIndex}" oninput="updateEditSchedulePreview()">
+          </div>
+          <div class="prize-builder">
+            <div class="card-title" style="margin-bottom:8px; font-size:13px;">
+              <span>স্কোয়াড / প্রাইজ লিস্ট এডিট</span>
+              <button type="button" class="btn btn-outline" style="padding:4px 8px; font-size:11px;" onclick="addPrizeRow('edit')">+ যোগ করুন</button>
+            </div>
+            <div id="edit-prize-rows"></div>
+            <div class="prize-summary-bar" id="edit-prize-summary"></div>
+          </div>
+          <div class="action-row">
+            <button type="button" class="btn btn-success" onclick="saveEditedMatch(${m.id})">✓ এডিট সেভ করুন</button>
+            <button type="button" class="btn btn-outline" onclick="toggleEditMatch(${m.id})">বাতিল</button>
+          </div>
+        </div>
+      ` : "";
+
+      return `
+        <div class="item-box">
+          <div class="item-top">
+            <div>
+              <div class="item-title">${m.title}</div>
+              <div class="item-meta">
+                <span class="tag tag-mode">${m.mode}</span>
+                ম্যাপ: ${m.map} • ফি: ৳${m.fee} • পুল: ৳${m.prize}
+              </div>
+              <div class="item-meta">সময়সূচি: <b>${m.time}</b></div>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-outline" onclick="toggleEditMatch(${m.id})">✏️ এডিট</button>
+              <button class="btn btn-danger" onclick="deleteMatch(${m.id})">ডিলিট</button>
+            </div>
+          </div>
+          ${prizeHtml}
+          <div class="item-meta" style="margin:10px 0 6px;color:var(--success);font-weight:800">জয়েন করেছে: ${joinedPlayerCount} প্লেয়ার (${participantEntries.length} অ্যাকাউন্ট)</div>
+          <div class="item-box" style="padding:10px;margin:6px 0 12px"><div style="font-weight:800;margin-bottom:6px">জয়েন করা প্লেয়ারদের User ID</div>${participantHtml}</div>
+          <div class="room-inputs">
+            <input type="text" id="rid-${m.id}" value="${escapeAttr(m.roomId)}" placeholder="Room ID">
+            <input type="text" id="rpass-${m.id}" value="${escapeAttr(m.roomPass)}" placeholder="Password">
+            <button class="btn btn-success" onclick="saveRoomCredentials(${m.id})">সেভ</button>
+          </div>
+          ${editBoxHtml}
+        </div>
+      `;
+    }).join("");
+
+    if (editingMatchId !== null) {
+      renderPrizeRows("edit");
+    }
+  }
+
+  function renderBannedPlayers() {
+    const listEl = document.getElementById("banned-list");
+    if (!state.bannedPlayers.length) {
+      listEl.innerHTML = `<div class="empty-state">কোনো ব্যান করা প্লেয়ার নেই।</div>`;
+      return;
+    }
+    listEl.innerHTML = state.bannedPlayers.map(b => `
+      <div class="item-box banned-card">
+        <div class="item-top">
+          <div>
+            <div class="item-title">${b.name} <span class="tag tag-banned">BANNED</span></div>
+            <div class="item-meta">UID: <b>${b.uid}</b> • কারণ: ${b.reason || "নিয়ম ভঙ্গ"}</div>
+            <div class="item-meta">সময়: ${b.time}</div>
+          </div>
+          <button class="btn btn-success" onclick="unbanPlayer(${b.id})">Unban</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function renderNotices() {
+    const listEl = document.getElementById("notice-list");
+    if (!state.notices.length) {
+      listEl.innerHTML = `<div class="empty-state">কোনো নোটিস নেই।</div>`;
+      return;
+    }
+    listEl.innerHTML = state.notices.map(n => `
+      <div class="item-box">
+        <div class="item-title" style="font-size:14px; font-weight:600;">${n.text}</div>
+        <div class="item-meta">আপডেট: ${n.time}</div>
+      </div>
+    `).join("");
+  }
+
+  function renderAll() {
+    renderStats();
+    renderDeposits();
+    renderMatches();
+    renderBannedPlayers();
+    renderNotices();
+    renderBgPreview();
+  }
+
+  loadSettingsToForm();
+  updateSchedulePreview();
+  renderPrizeRows("create");
+  initializeCloudSync();
+</script>
+</body>
+</html>
